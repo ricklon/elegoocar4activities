@@ -24,6 +24,7 @@ Existing control paths still work:
 - For protocol/system behavior: `docs/SYSTEM_PROTOCOL.md`
 - For project context: `docs/PROJECT_OVERVIEW.md`
 - For mixed-platform activities (stock app + this dashboard): `docs/STEM_ACTIVITY_CARDS_CROSS_PLATFORM.md`
+- For no-network IR-remote activities: `docs/STEM_ACTIVITY_CARDS_IR_REMOTE.md`
 - For UI usage details: `wifi-control-ui/README.md`
 - For firmware layout and compile notes: `arduino-code/README.md`
 
@@ -34,6 +35,7 @@ Existing control paths still work:
 - [Project Overview](docs/PROJECT_OVERVIEW.md)
 - [STEM Activity Cards (Classroom)](docs/STEM_ACTIVITY_CARDS.md)
 - [STEM Activity Cards (Cross-Platform)](docs/STEM_ACTIVITY_CARDS_CROSS_PLATFORM.md)
+- [STEM Activity Cards (IR Remote Only)](docs/STEM_ACTIVITY_CARDS_IR_REMOTE.md)
 - [Arduino CLI Guide](docs/ARDUINO_CLI_GUIDE.md)
 - [ESP32-S3 Troubleshooting](docs/ESP32_S3_TROUBLESHOOTING.md)
 - [Licensing](docs/LICENSING.md)
@@ -124,6 +126,7 @@ More classroom activities and mode-based workflows are documented in:
 - [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)
 - [docs/STEM_ACTIVITY_CARDS.md](docs/STEM_ACTIVITY_CARDS.md)
 - [docs/STEM_ACTIVITY_CARDS_CROSS_PLATFORM.md](docs/STEM_ACTIVITY_CARDS_CROSS_PLATFORM.md)
+- [docs/STEM_ACTIVITY_CARDS_IR_REMOTE.md](docs/STEM_ACTIVITY_CARDS_IR_REMOTE.md)
 - [wifi-control-ui/STUDENT_QUICKSTART.md](wifi-control-ui/STUDENT_QUICKSTART.md)
 
 ## Compatibility and Roadmap

@@ -21,7 +21,7 @@ const MODE_CODE = {
 };
 
 export default function App() {
-  const [theme, setTheme] = useState(() => localStorage.getItem('car-ui-theme') || 'default');
+  const [theme, setTheme] = useState(() => localStorage.getItem('car-ui-theme') || 'bigtrak');
   const [bridgeHost, setBridgeHost] = useState('localhost:8787');
   const [carHost, setCarHost] = useState('192.168.4.1');
   const [tcpPort, setTcpPort] = useState(100);
