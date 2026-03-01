@@ -2,6 +2,18 @@
 
 This is the canonical startup checklist for this project.
 
+## 0. Install Node.js (includes npm)
+
+On Windows, macOS, or Linux, install Node.js LTS first:
+- https://nodejs.org/en/download/
+
+Verify:
+
+```bash
+node -v
+npm -v
+```
+
 ## 1. Power + Network
 
 1. Power on the car.
@@ -11,16 +23,24 @@ This is the canonical startup checklist for this project.
 
 ## 2. Start Control Stack
 
-Terminal A:
+Preferred (one command):
 
 ```bash
 cd wifi-control-ui
-npm run bridge
+npm install
+npm run car
 ```
 
-Terminal B:
+Aliases: `npm run classroom`, `npm run start-car`
+
+Alternative (two terminals):
 
 ```bash
+# terminal A
+cd wifi-control-ui
+npm run bridge
+
+# terminal B
 cd wifi-control-ui
 npm run dev -- --host
 ```

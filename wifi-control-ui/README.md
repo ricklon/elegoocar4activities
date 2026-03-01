@@ -40,7 +40,8 @@ Browser cannot open raw TCP directly to `192.168.4.1:100`, so this project uses 
 
 ## Requirements
 
-- Node.js 18+ (tested with Node 24)
+- Node.js 18+ (tested with Node 24). npm is included with Node.js.
+  - Install Node.js LTS (Windows/macOS/Linux): https://nodejs.org/en/download/
 - Car running ESP32 firmware that provides:
   - camera stream on port 81
   - control socket on port 100
@@ -50,12 +51,23 @@ Browser cannot open raw TCP directly to `192.168.4.1:100`, so this project uses 
 ```bash
 cd wifi-control-ui
 npm install
-npm run bridge
+npm run car
 ```
 
-Open a second terminal:
+Aliases: `npm run classroom`, `npm run start-car`
+
+The launcher starts:
+- bridge (`server/bridge.mjs`)
+- Vite dev server (`vite --host`)
+
+If you prefer manual control, run in two terminals:
 
 ```bash
+# terminal A
+cd wifi-control-ui
+npm run bridge
+
+# terminal B
 cd wifi-control-ui
 npm run dev -- --host
 ```

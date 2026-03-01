@@ -22,6 +22,20 @@ It combines curated firmware copies with a browser FPV dashboard and a local bri
 - [ESP32-S3 Troubleshooting](docs/ESP32_S3_TROUBLESHOOTING.md)
 - [Licensing](docs/LICENSING.md)
 
+## Prerequisites (Windows, macOS, Linux)
+
+To run this project, install **Node.js LTS** (npm is included with Node.js):
+- Download: [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
+
+After install, verify in a terminal:
+
+```bash
+node -v
+npm -v
+```
+
+If both commands print versions, you are ready to run the project.
+
 ## What This Project Adds
 
 - Browser-based FPV driving (joystick, D-pad, keyboard)
