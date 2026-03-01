@@ -5,6 +5,19 @@
 This repository is a classroom-focused control stack for the ELEGOO Smart Robot Car V4.0.
 It combines curated firmware copies with a browser FPV dashboard and a local bridge service.
 
+## Default Behavior vs This Project
+
+By default, ELEGOO cars run a local web server/control stack on the car itself, and students join the car's Wi-Fi network (`ELEGOO-...`) to control it.
+
+This project is an alternative to the default ELEGOO Android app:
+- It provides a web-based interface for anyone who can join the car network.
+- It exposes telemetry/data, car modes, and control features in a browser UI.
+- It retains compatibility with stock vehicle behavior and requires no firmware changes for core use.
+
+Existing control paths still work:
+- IR remote support remains available.
+- The default Android app and other stock features can still be used.
+
 ## Start Here
 
 - For classroom bring-up: `docs/QUICKSTART.md`
@@ -107,6 +120,15 @@ More classroom activities and mode-based workflows are documented in:
 - [docs/QUICKSTART.md](docs/QUICKSTART.md)
 - [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)
 - [wifi-control-ui/STUDENT_QUICKSTART.md](wifi-control-ui/STUDENT_QUICKSTART.md)
+
+## Compatibility and Roadmap
+
+- Current state:
+  - Compatible with existing ELEGOO firmware/control model.
+  - Supports connecting to different cars by changing host/IP in the UI.
+- Planned/desired improvements:
+  - Add support for more telemetry (for example, IMU and other currently unexposed data).
+  - Improve multi-car networking so many cars can operate on a shared network more easily.
 
 ## Notes
 
