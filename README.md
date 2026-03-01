@@ -13,6 +13,15 @@ It combines curated firmware copies with a browser FPV dashboard and a local bri
 - For UI usage details: `wifi-control-ui/README.md`
 - For firmware layout and compile notes: `arduino-code/README.md`
 
+## Docs Index
+
+- [Quickstart](docs/QUICKSTART.md)
+- [System Protocol](docs/SYSTEM_PROTOCOL.md)
+- [Project Overview](docs/PROJECT_OVERVIEW.md)
+- [Arduino CLI Guide](docs/ARDUINO_CLI_GUIDE.md)
+- [ESP32-S3 Troubleshooting](docs/ESP32_S3_TROUBLESHOOTING.md)
+- [Licensing](docs/LICENSING.md)
+
 ## What This Project Adds
 
 - Browser-based FPV driving (joystick, D-pad, keyboard)
@@ -40,17 +49,24 @@ It combines curated firmware copies with a browser FPV dashboard and a local bri
 
 ## Quick Dev Run (UI + Bridge)
 
-Terminal A:
+Preferred (one command):
 
 ```bash
 cd wifi-control-ui
 npm install
-npm run bridge
+npm run car
 ```
 
-Terminal B:
+Aliases: `npm run classroom`, `npm run start-car`
+
+If you want manual split terminals instead:
 
 ```bash
+# terminal A
+cd wifi-control-ui
+npm run bridge
+
+# terminal B
 cd wifi-control-ui
 npm run dev -- --host
 ```
@@ -59,6 +75,24 @@ Open the Vite URL (typically `http://localhost:5173`), then use:
 - Bridge Host:Port = `localhost:8787`
 - Car Host = `192.168.4.1`
 - Car TCP Port = `100`
+
+## Basic Car Connection (Fast Path)
+
+1. Power on the car.
+2. Join the car Wi-Fi network (`ELEGOO-...`) on your laptop/phone.
+3. Start the app from `wifi-control-ui` with `npm run car`.
+4. Open the UI URL shown in terminal (typically `http://localhost:5173`).
+5. In the UI, click `Connect Bridge + Car` and verify:
+   - `Bridge: online`
+   - `Car TCP: online`
+   - camera stream visible
+
+## Activities
+
+More classroom activities and mode-based workflows are documented in:
+- [docs/QUICKSTART.md](docs/QUICKSTART.md)
+- [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)
+- [wifi-control-ui/STUDENT_QUICKSTART.md](wifi-control-ui/STUDENT_QUICKSTART.md)
 
 ## Notes
 
