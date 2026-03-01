@@ -716,42 +716,54 @@ function CarModesPanel({
         {selectedMode === 'manual' && (
           <ChallengeCard
             title="Precision Dock"
-            objective="Drive into target zone and stop smoothly."
-            metricLabel="Distance in 15-30 cm window + low parse misses"
+            objective="Stop with front bumper in a 15-30 cm dock window without crossing the target line."
+            setup="Start about 1.5 m from a tape line. Use joystick or D-pad only."
+            metricLabel="Dock zone + parse misses"
             metricValue={`${boolTxt(between(telemetry.ultrasonicCm, 15, 30))} / misses: ${fmt(telemetry.linkParseMisses)}`}
             pass={between(telemetry.ultrasonicCm, 15, 30) && Number(telemetry.linkParseMisses ?? 0) < 3}
-            passText="PASS when distance is 15-30 cm and parse misses < 3."
+            recordHint="Record final distance, number of attempts, and parse misses."
+            explainPrompt="Which control change (speed, dead zone, interval) improved final approach accuracy?"
+            passText="PASS when distance is 15-30 cm and parse misses stay under 3."
           />
         )}
         {selectedMode === 'line' && (
           <ChallengeCard
-            title="Track Lock"
-            objective="Keep the center sensor on track while moving."
-            metricLabel="Mid sensor in selected threshold range"
+            title="Line Sensor Detective"
+            objective="Use line telemetry to identify a reliable line-detect window for your current floor and lighting."
+            setup="In manual mode, capture IR L/M/R on tape and on bare floor, then switch to line mode."
+            metricLabel="IR Mid in selected threshold range"
             metricValue={boolTxt(between(telemetry.irMid, modeLabCfg.lineLow, modeLabCfg.lineHigh))}
             pass={between(telemetry.irMid, modeLabCfg.lineLow, modeLabCfg.lineHigh)}
-            passText="PASS when IR Mid stays inside threshold window."
+            recordHint="Record IR values on tape vs floor and your chosen low/high thresholds."
+            explainPrompt="Why might the same thresholds fail under different lighting or on a different surface?"
+            passText="PASS when IR Mid stays inside your selected threshold window."
           />
         )}
         {selectedMode === 'obstacle' && (
           <ChallengeCard
-            title="Safe Avoid"
-            objective="Detect and react before contact."
-            metricLabel="Obstacle flag + distance below teach threshold"
+            title="Obstacle Reaction Distance"
+            objective="Measure when the robot first shows consistent obstacle reaction behavior."
+            setup="Move a flat object slowly from ~50 cm toward ~10 cm while obstacle mode is active."
+            metricLabel="Firmware obstacle flag + teach threshold window"
             metricValue={`${boolTxt(telemetry.obstacleDetected)} / ${boolTxt(
               between(telemetry.ultrasonicCm, 0, modeLabCfg.obstacleTeachCm)
             )}`}
             pass={Boolean(telemetry.obstacleDetected)}
-            passText="PASS when firmware obstacle flag turns true before contact."
+            recordHint="Record the first repeated distance where obstacleDetected flips true."
+            explainPrompt="How close was your observed trigger distance to the expected ~20 cm firmware threshold?"
+            passText="PASS when obstacleDetected turns true before contact."
           />
         )}
         {selectedMode === 'follow' && (
           <ChallengeCard
-            title="Target Lock"
-            objective="Maintain target in follow range."
+            title="Follow Zone Challenge"
+            objective="Maintain target lock as long as possible while a target object moves in front of the car."
+            setup="Move the target slowly and steadily; avoid sudden jumps or side exits."
             metricLabel="Distance below follow lock threshold"
             metricValue={boolTxt(between(telemetry.ultrasonicCm, 0, modeLabCfg.followTeachCm))}
             pass={between(telemetry.ultrasonicCm, 0, modeLabCfg.followTeachCm)}
+            recordHint="Record longest lock duration and the movement pattern that broke lock."
+            explainPrompt="What target speed or path caused lock loss first, and why?"
             passText="PASS when target remains inside follow lock range."
           />
         )}
@@ -790,14 +802,17 @@ function ModeMetric({ label, value }) {
   );
 }
 
-function ChallengeCard({ title, objective, metricLabel, metricValue, pass, passText }) {
+function ChallengeCard({ title, objective, setup, metricLabel, metricValue, recordHint, explainPrompt, pass, passText }) {
   return (
     <div className="rounded border border-slate-700 bg-slate-950 p-3 text-xs">
       <div className="text-sm font-semibold text-slate-100">{title}</div>
       <div className="mt-1 text-slate-300">Objective: {objective}</div>
+      {setup ? <div className="mt-1 text-slate-300">Setup: {setup}</div> : null}
       <div className="mt-1 text-slate-300">
         Metric: {metricLabel} = <span className="font-semibold text-slate-100">{metricValue}</span>
       </div>
+      {recordHint ? <div className="mt-1 text-slate-300">Record: {recordHint}</div> : null}
+      {explainPrompt ? <div className="mt-1 text-slate-300">Explain: {explainPrompt}</div> : null}
       <div
         className={`bt-badge mt-2 ${
           pass ? 'bt-pass bg-ok/20 text-ok' : 'bt-progress bg-bad/20 text-bad'
