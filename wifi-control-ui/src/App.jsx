@@ -22,9 +22,12 @@ const MODE_CODE = {
 
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('car-ui-theme') || 'bigtrak');
-  const [bridgeHost, setBridgeHost] = useState('localhost:8787');
-  const [carHost, setCarHost] = useState('192.168.4.1');
-  const [tcpPort, setTcpPort] = useState(100);
+  const [bridgeHost, setBridgeHost] = useState(() => localStorage.getItem('car-ui-bridge-host') || 'localhost:8787');
+  const [carHost, setCarHost] = useState(() => localStorage.getItem('car-ui-car-host') || '192.168.4.1');
+  const [tcpPort, setTcpPort] = useState(() => {
+    const saved = Number(localStorage.getItem('car-ui-tcp-port'));
+    return Number.isFinite(saved) && saved > 0 ? saved : 100;
+  });
   const [bridgeConnected, setBridgeConnected] = useState(false);
   const [carConnected, setCarConnected] = useState(false);
   const [lastFrame, setLastFrame] = useState('');
@@ -77,6 +80,18 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme === 'bigtrak' ? 'bigtrak' : 'default');
     localStorage.setItem('car-ui-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('car-ui-bridge-host', bridgeHost);
+  }, [bridgeHost]);
+
+  useEffect(() => {
+    localStorage.setItem('car-ui-car-host', carHost);
+  }, [carHost]);
+
+  useEffect(() => {
+    localStorage.setItem('car-ui-tcp-port', String(tcpPort));
+  }, [tcpPort]);
 
   const connectBridge = () => {
     wsRef.current?.close();

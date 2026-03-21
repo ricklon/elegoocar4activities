@@ -86,16 +86,6 @@ void SocketServer_Test(void)
         }
         Heartbeat_time = millis();
       }
-      static unsigned long Test_time = 0;
-      if (millis() - Test_time > 1000)
-      {
-        Test_time = millis();
-        if (0 == (WiFi.softAPgetStationNum()))
-        {
-          Serial2.print("{\"N\":100}");
-          break;
-        }
-      }
     }
     Serial2.print("{\"N\":100}");
     client.stop();

@@ -60,13 +60,13 @@ void CameraWebServer_AP::CameraWebServer_AP_Init(void)
   }
   
   sensor_t *s = esp_camera_sensor_get();
-  s->set_framesize(s, FRAMESIZE_SVGA);
+  s->set_framesize(s, FRAMESIZE_VGA);
 
 #if defined(CAMERA_MODEL_M5STACK_WIDE)
   s->set_vflip(s, 0);
   s->set_hmirror(s, 1);
 #endif
-  s->set_vflip(s, 0);
+  s->set_vflip(s, 1);
   s->set_hmirror(s, 0);
 
   Serial.println("\r\n");
@@ -74,6 +74,7 @@ void CameraWebServer_AP::CameraWebServer_AP_Init(void)
   access_point_ssid = BuildDefaultAccessPointSSID();
   wifi_name = access_point_ssid.substring(strlen(ssid));
   WiFi.setTxPower(WIFI_POWER_19_5dBm);
+  WiFi.setSleep(false);
   WiFi.persistent(false);
   if (!ConnectSavedStation(kInitialStaConnectTimeoutMs))
   {
