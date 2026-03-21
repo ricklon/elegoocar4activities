@@ -172,6 +172,27 @@ function processCarFrame(frame) {
       broadcast({ type: 'telemetry', data: { onGround: val === 'true' } });
     }
   }
+  if (parsed.key === 'AX') {
+    broadcast({ type: 'telemetry', data: { imuAx: parsed.number } });
+  }
+  if (parsed.key === 'AY') {
+    broadcast({ type: 'telemetry', data: { imuAy: parsed.number } });
+  }
+  if (parsed.key === 'AZ') {
+    broadcast({ type: 'telemetry', data: { imuAz: parsed.number } });
+  }
+  if (parsed.key === 'GX') {
+    broadcast({ type: 'telemetry', data: { imuGx: parsed.number } });
+  }
+  if (parsed.key === 'GY') {
+    broadcast({ type: 'telemetry', data: { imuGy: parsed.number } });
+  }
+  if (parsed.key === 'GZ') {
+    broadcast({ type: 'telemetry', data: { imuGz: parsed.number } });
+  }
+  if (parsed.key === 'YW') {
+    broadcast({ type: 'telemetry', data: { imuYawCdeg: parsed.number } });
+  }
 }
 
 function parseReply(frame) {
@@ -216,7 +237,14 @@ function probesForMode(mode) {
     { N: 22, D1: 0, H: 'IL' },
     { N: 22, D1: 1, H: 'IM' },
     { N: 22, D1: 2, H: 'IR' },
-    { N: 23, H: 'GR' }
+    { N: 23, H: 'GR' },
+    { N: 24, D1: 1, H: 'AX' },
+    { N: 24, D1: 2, H: 'AY' },
+    { N: 24, D1: 3, H: 'AZ' },
+    { N: 24, D1: 4, H: 'GX' },
+    { N: 24, D1: 5, H: 'GY' },
+    { N: 24, D1: 6, H: 'GZ' },
+    { N: 24, D1: 7, H: 'YW' }
   ];
 }
 

@@ -81,3 +81,8 @@ bool MPU6050_getdata::MPU6050_dveGetEulerAngles(float *Yaw)
   *Yaw = agz;
   return false;
 }
+
+void MPU6050_getdata::MPU6050_dveGetRawData(int16_t *ax, int16_t *ay, int16_t *az, int16_t *gx, int16_t *gy, int16_t *gz_out)
+{
+  accelgyro.getMotion6(ax, ay, az, gx, gy, gz_out);
+}

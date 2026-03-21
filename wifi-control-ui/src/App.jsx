@@ -36,6 +36,13 @@ export default function App() {
     irMid: null,
     irRight: null,
     onGround: null,
+    imuAx: null,
+    imuAy: null,
+    imuAz: null,
+    imuGx: null,
+    imuGy: null,
+    imuGz: null,
+    imuYawCdeg: null,
     linkRxFrames: 0,
     linkParseMisses: 0,
     linkLastFrameAt: null,
@@ -231,6 +238,13 @@ export default function App() {
         ir_mid: telemetry.irMid ?? '',
         ir_right: telemetry.irRight ?? '',
         on_ground: telemetry.onGround ?? '',
+        imu_ax: telemetry.imuAx ?? '',
+        imu_ay: telemetry.imuAy ?? '',
+        imu_az: telemetry.imuAz ?? '',
+        imu_gx: telemetry.imuGx ?? '',
+        imu_gy: telemetry.imuGy ?? '',
+        imu_gz: telemetry.imuGz ?? '',
+        imu_yaw_cdeg: telemetry.imuYawCdeg ?? '',
         link_rx_frames: telemetry.linkRxFrames ?? '',
         link_parse_misses: telemetry.linkParseMisses ?? ''
       });
@@ -856,6 +870,19 @@ function SensorExplorer({ telemetry, lastFrame, activeMode }) {
           rows={[{ label: 'On Ground', value: boolTxt(telemetry.onGround) }]}
         />
         <SensorGroup
+          title="IMU / MPU6050"
+          subtitle="Raw accelerometer and gyroscope readings from the UNO"
+          rows={[
+            { label: 'Accel X', value: fmt(telemetry.imuAx) },
+            { label: 'Accel Y', value: fmt(telemetry.imuAy) },
+            { label: 'Accel Z', value: fmt(telemetry.imuAz) },
+            { label: 'Gyro X', value: fmt(telemetry.imuGx) },
+            { label: 'Gyro Y', value: fmt(telemetry.imuGy) },
+            { label: 'Gyro Z', value: fmt(telemetry.imuGz) },
+            { label: 'Yaw (cdeg)', value: fmt(telemetry.imuYawCdeg) }
+          ]}
+        />
+        <SensorGroup
           title="Link / Protocol"
           subtitle="Raw command channel health from bridge"
           rows={[
@@ -875,7 +902,6 @@ function SensorExplorer({ telemetry, lastFrame, activeMode }) {
           subtitle="Requires UNO protocol/firmware extension"
           rows={[
             { label: 'Battery Voltage', value: 'not exposed', muted: true },
-            { label: 'IMU Tilt/Accel', value: 'not exposed', muted: true },
             { label: 'Motor PWM / Wheel Speed', value: 'not exposed', muted: true }
           ]}
         />
