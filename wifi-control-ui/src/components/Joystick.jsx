@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { clamp } from '../lib/protocol';
 
 export default function Joystick({ onChange, disabled = false }) {
@@ -29,12 +29,27 @@ export default function Joystick({ onChange, disabled = false }) {
     onChange?.(zero);
   };
 
+  useEffect(() => {
+    if (disabled) reset();
+  }, [disabled]);
+
   const thumbStyle = useMemo(
     () => ({
       transform: `translate(calc(-50% + ${vector.x * 36}px), calc(-50% + ${vector.y * 36}px))`
     }),
     [vector.x, vector.y]
   );
+
+  const releaseCapture = (el, pointerId) => {
+    if (!el) return;
+    try {
+      if (pointerId != null && el.hasPointerCapture?.(pointerId)) {
+        el.releasePointerCapture(pointerId);
+      }
+    } catch {
+      // Ignore capture release errors; reset still clears local state.
+    }
+  };
 
   return (
     <div
@@ -43,7 +58,11 @@ export default function Joystick({ onChange, disabled = false }) {
       onPointerDown={(e) => {
         if (disabled) return;
         activePointer.current = e.pointerId;
-        e.currentTarget.setPointerCapture(e.pointerId);
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          // Some environments can reject capture; drag still works without it.
+        }
         handlePoint(e.clientX, e.clientY);
       }}
       onPointerMove={(e) => {
@@ -52,16 +71,21 @@ export default function Joystick({ onChange, disabled = false }) {
         handlePoint(e.clientX, e.clientY);
       }}
       onPointerUp={(e) => {
-        if (disabled) return;
         if (activePointer.current !== e.pointerId) return;
+        releaseCapture(e.currentTarget, e.pointerId);
         reset();
       }}
-      onPointerCancel={reset}
+      onPointerCancel={(e) => {
+        if (activePointer.current !== e.pointerId) return;
+        releaseCapture(e.currentTarget, e.pointerId);
+        reset();
+      }}
+      onLostPointerCapture={reset}
       style={{ opacity: disabled ? 0.5 : 1 }}
     >
       <div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-400" />
       <div
-        className="absolute left-1/2 top-1/2 h-12 w-12 rounded-full border border-accent bg-sky-400/20"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-12 w-12 rounded-full border border-accent bg-sky-400/20"
         style={thumbStyle}
       />
     </div>

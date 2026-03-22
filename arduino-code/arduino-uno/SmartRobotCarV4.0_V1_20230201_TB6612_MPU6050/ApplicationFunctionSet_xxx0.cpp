@@ -21,6 +21,27 @@
 
 ApplicationFunctionSet Application_FunctionSet;
 
+namespace
+{
+void PrintCommandFrameSuffix(const String &commandSerialNumber, const __FlashStringHelper *suffix)
+{
+  Serial.print('{');
+  Serial.print(commandSerialNumber);
+  Serial.print('_');
+  Serial.print(suffix);
+  Serial.print('}');
+}
+
+void PrintCommandFrameValue(const String &commandSerialNumber, long value)
+{
+  Serial.print('{');
+  Serial.print(commandSerialNumber);
+  Serial.print('_');
+  Serial.print(value);
+  Serial.print('}');
+}
+}
+
 /*Hardware device object list*/
 MPU6050_getdata AppMPU6050getdata;
 DeviceDriverSet_RBGLED AppRBG_LED;
@@ -1168,7 +1189,7 @@ void ApplicationFunctionSet::CMD_CarControlTimeLimit_xxx0(uint8_t is_CarDirectio
         {
 
 #if _is_print
-          Serial.print('{' + CommandSerialNumber + "_ok}");
+          PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
           CarControl_return = true;
         }
@@ -1215,7 +1236,7 @@ void ApplicationFunctionSet::CMD_CarControlTimeLimit_xxx0(void)
         {
 
 #if _is_print
-          Serial.print('{' + CommandSerialNumber + "_ok}");
+          PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
           CarControl_return = true;
         }
@@ -1373,7 +1394,7 @@ void ApplicationFunctionSet::CMD_LightingControlTimeLimit_xxx0(uint8_t is_Lighti
         {
 
 #if _is_print
-          Serial.print('{' + CommandSerialNumber + "_ok}");
+          PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
           LightingControl_return = true;
         }
@@ -1420,7 +1441,7 @@ void ApplicationFunctionSet::CMD_LightingControlTimeLimit_xxx0(void)
         {
 
 #if _is_print
-          Serial.print('{' + CommandSerialNumber + "_ok}");
+          PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
           LightingControl_return = true;
         }
@@ -1523,22 +1544,20 @@ void ApplicationFunctionSet::CMD_UltrasoundModuleStatus_xxx0(uint8_t is_get)
     if (true == UltrasoundDetectionStatus)
     {
 #if _is_print
-      Serial.print('{' + CommandSerialNumber + "_true}");
+      PrintCommandFrameSuffix(CommandSerialNumber, F("true"));
 #endif
     }
     else
     {
 #if _is_print
-      Serial.print('{' + CommandSerialNumber + "_false}");
+      PrintCommandFrameSuffix(CommandSerialNumber, F("false"));
 #endif
     }
   }
   else if (2 == is_get) //ultrasonic sensor is_get data
   {
-    char toString[10];
-    sprintf(toString, "%d", UltrasoundData_cm);
 #if _is_print
-    Serial.print('{' + CommandSerialNumber + '_' + toString + '}');
+    PrintCommandFrameValue(CommandSerialNumber, UltrasoundData_cm);
 #endif
   }
 }
@@ -1549,12 +1568,10 @@ void ApplicationFunctionSet::CMD_UltrasoundModuleStatus_xxx0(uint8_t is_get)
 */
 void ApplicationFunctionSet::CMD_TraceModuleStatus_xxx0(uint8_t is_get)
 {
-  char toString[10];
   if (0 == is_get) /*Get left IR sensor status*/
   {
-    sprintf(toString, "%d", TrackingData_L);
 #if _is_print
-    Serial.print('{' + CommandSerialNumber + '_' + toString + '}');
+    PrintCommandFrameValue(CommandSerialNumber, TrackingData_L);
 #endif
     /*
     if (true == TrackingDetectionStatus_L)
@@ -1572,9 +1589,8 @@ void ApplicationFunctionSet::CMD_TraceModuleStatus_xxx0(uint8_t is_get)
   }
   else if (1 == is_get) /*Get middle IR sensor status*/
   {
-    sprintf(toString, "%d", TrackingData_M);
 #if _is_print
-    Serial.print('{' + CommandSerialNumber + '_' + toString + '}');
+    PrintCommandFrameValue(CommandSerialNumber, TrackingData_M);
 #endif
     /*
     if (true == TrackingDetectionStatus_M)
@@ -1592,9 +1608,8 @@ void ApplicationFunctionSet::CMD_TraceModuleStatus_xxx0(uint8_t is_get)
   }
   else if (2 == is_get) /*Get right IR sensor status*/
   {
-    sprintf(toString, "%d", TrackingData_R);
 #if _is_print
-    Serial.print('{' + CommandSerialNumber + '_' + toString + '}');
+    PrintCommandFrameValue(CommandSerialNumber, TrackingData_R);
 #endif
     /*
         if (true == TrackingDetectionStatus_R)
@@ -1657,11 +1672,7 @@ void ApplicationFunctionSet::CMD_IMUModuleStatus_xxx0(uint8_t is_get)
   }
 
 #if _is_print
-  Serial.print('{');
-  Serial.print(CommandSerialNumber);
-  Serial.print('_');
-  Serial.print(value);
-  Serial.print('}');
+  PrintCommandFrameValue(CommandSerialNumber, value);
 #endif
 }
 
@@ -1674,11 +1685,7 @@ void ApplicationFunctionSet::CMD_BatteryVoltage_xxx0(void)
   long value = (long)(VoltageData_V * 100.0f);
 
 #if _is_print
-  Serial.print('{');
-  Serial.print(CommandSerialNumber);
-  Serial.print('_');
-  Serial.print(value);
-  Serial.print('}');
+  PrintCommandFrameValue(CommandSerialNumber, value);
 #endif
 }
 
@@ -1890,7 +1897,7 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
         CMD_is_MotorDirection = doc["D3"];
 
 #if _is_print
-        Serial.print('{' + CommandSerialNumber + "_ok}");
+        PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
         break;
 
@@ -1910,7 +1917,7 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
         CMD_is_CarDirection = doc["D1"];
         CMD_is_CarSpeed = doc["D2"];
 #if _is_print
-        Serial.print('{' + CommandSerialNumber + "_ok}");
+        PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
         break;
 
@@ -1919,7 +1926,7 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
         CMD_is_MotorSpeed_L = doc["D1"];
         CMD_is_MotorSpeed_R = doc["D2"];
 #if _is_print
-        Serial.print('{' + CommandSerialNumber + "_ok}");
+        PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
         break;
       case 5:                                                             /*<Command：N 5> */
@@ -1927,7 +1934,7 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
         CMD_is_Servo = doc["D1"];
         CMD_is_Servo_angle = doc["D2"];
 #if _is_print
-        Serial.print('{' + CommandSerialNumber + "_ok}");
+        PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
         break;
       case 7:                                                                          /*<Command：N 7> */
@@ -1952,7 +1959,7 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
         CMD_is_LightingColorValue_G = doc["D3"];
         CMD_is_LightingColorValue_B = doc["D4"];
 #if _is_print
-        Serial.print('{' + CommandSerialNumber + "_ok}");
+        PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
         break;
 
@@ -1974,13 +1981,13 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
         if (true == Car_LeaveTheGround)
         {
 #if _is_print
-          Serial.print('{' + CommandSerialNumber + "_false}");
+          PrintCommandFrameSuffix(CommandSerialNumber, F("false"));
 #endif
         }
         else if (false == Car_LeaveTheGround)
         {
 #if _is_print
-          Serial.print('{' + CommandSerialNumber + "_true}");
+          PrintCommandFrameSuffix(CommandSerialNumber, F("true"));
 #endif
         }
         break;
@@ -1996,7 +2003,7 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
       case 110:                                                                                 /*<Command：N 110> */
         Application_SmartRobotCarxxx0.Functional_Mode = CMD_ClearAllFunctions_Programming_mode; /*Clear all function:Enter programming mode*/
 #if _is_print
-        Serial.print('{' + CommandSerialNumber + "_ok}");
+        PrintCommandFrameSuffix(CommandSerialNumber, F("ok"));
 #endif
         break;
       case 100:                                                                             /*<Command：N 100> */

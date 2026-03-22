@@ -102,6 +102,28 @@ Global variables use 1221 bytes (59%) of dynamic memory.
 arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno "$UNO_FIRMWARE_PATH"
 ```
 
+Project helper script:
+
+```bash
+bash arduino-code/bin/flash-uno-imu.sh
+```
+
+## Important: Flash The UNO By Itself
+
+For reliable UNO uploads on this car, isolate the UNO before flashing:
+
+1. Turn the car battery `OFF`
+2. Disconnect the ESP32 / WROVER / ESP32-S3 from the UNO serial pins
+3. Connect the UNO to USB by itself
+4. Run the upload
+5. After upload completes, disconnect UNO USB and reconnect the car normally
+
+Why this matters:
+
+- the UNO uses its hardware serial pins for both USB upload and ESP32 communication
+- if the ESP32 is still attached and the car is powered, the shared serial lines can interfere with upload
+- in practice, uploads that failed with the full car connected succeeded once the battery was off and the ESP32 was disconnected
+
 ## Troubleshooting
 
 ### "Programmer is not responding" / "Not in sync"
@@ -141,6 +163,20 @@ This is common with CH340 USB-serial chips. Try:
 lsusb
 
 # Look for QinHeng Electronics CH340 (common USB-serial chip)
+```
+
+### PlatformIO Monitor Permission Error
+
+If `pio device monitor` fails with a home-directory permission error under `~/.platformio/.cache`, fix the ownership and retry:
+
+```bash
+sudo chown -R "$USER:$USER" ~/.platformio
+```
+
+Then run the monitor again:
+
+```bash
+pio device monitor -p /dev/ttyUSB0 -b 115200
 ```
 
 ### Upload Successful But Car Not Responding

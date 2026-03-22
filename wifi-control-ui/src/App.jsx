@@ -53,7 +53,7 @@ export default function App() {
     updatedAt: null
   });
   const [driveCfg, setDriveCfg] = useState({
-    sendIntervalMs: 120,
+    sendIntervalMs: 80,
     minSpeed: 45,
     maxSpeed: 210,
     deadZone: 0.2
@@ -141,6 +141,21 @@ export default function App() {
     ws.send(JSON.stringify({ type: 'send-json', payload }));
   };
 
+  const sendDriveVectorNow = (nextVector) => {
+    if (activeMode !== 'manual') return;
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    const cmd = driveCommandFromVector(nextVector.x, nextVector.y, driveCfg);
+    const body = JSON.stringify(cmd);
+    lastCommandRef.current = body;
+    ws.send(JSON.stringify({ type: 'send-json', payload: cmd }));
+  };
+
+  const applyDriveVector = (nextVector) => {
+    setVector(nextVector);
+    sendDriveVectorNow(nextVector);
+  };
+
   const stopCar = () => {
     setVector({ x: 0, y: 0 });
     lastCommandRef.current = '';
@@ -188,12 +203,11 @@ export default function App() {
   };
 
   const turnSelectedModeOff = () => {
-    if (selectedMode === 'manual') {
+    if (activeMode === 'manual') {
       switchToManualMode('manual turned off');
       return;
     }
-    if (activeMode !== selectedMode) return;
-    switchToManualMode(`${modeLabel(selectedMode)} turned off`);
+    switchToManualMode(`${modeLabel(activeMode)} turned off`);
   };
 
   useEffect(() => {
@@ -216,15 +230,15 @@ export default function App() {
     const onDown = (e) => {
       if (activeMode !== 'manual') return;
       if (e.repeat) return;
-      if (e.key === 'ArrowUp') setVector({ x: 0, y: -1 });
-      if (e.key === 'ArrowDown') setVector({ x: 0, y: 1 });
-      if (e.key === 'ArrowLeft') setVector({ x: -1, y: 0 });
-      if (e.key === 'ArrowRight') setVector({ x: 1, y: 0 });
-      if (e.key === ' ') setVector({ x: 0, y: 0 });
+      if (e.key === 'ArrowUp') applyDriveVector({ x: 0, y: -1 });
+      if (e.key === 'ArrowDown') applyDriveVector({ x: 0, y: 1 });
+      if (e.key === 'ArrowLeft') applyDriveVector({ x: -1, y: 0 });
+      if (e.key === 'ArrowRight') applyDriveVector({ x: 1, y: 0 });
+      if (e.key === ' ') applyDriveVector({ x: 0, y: 0 });
     };
     const onUp = (e) => {
       if (activeMode !== 'manual') return;
-      if (e.key.startsWith('Arrow') || e.key === ' ') setVector({ x: 0, y: 0 });
+      if (e.key.startsWith('Arrow') || e.key === ' ') applyDriveVector({ x: 0, y: 0 });
     };
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup', onUp);
@@ -232,7 +246,7 @@ export default function App() {
       window.removeEventListener('keydown', onDown);
       window.removeEventListener('keyup', onUp);
     };
-  }, [activeMode]);
+  }, [activeMode, driveCfg]);
 
   useEffect(() => {
     if (!isRecording) return;
@@ -430,7 +444,7 @@ export default function App() {
         <section className="grid gap-4">
           <div className="panel">
             <h2 className="mb-2 text-lg font-semibold">Control</h2>
-            <Joystick onChange={setVector} disabled={activeMode !== 'manual'} />
+            <Joystick onChange={applyDriveVector} disabled={activeMode !== 'manual'} />
             <div className="mx-auto mt-3 grid w-44 grid-cols-3 gap-2">
               {dpad.map((a, i) =>
                 a ? (
@@ -438,11 +452,10 @@ export default function App() {
                     key={`${a.label}-${i}`}
                     className={`bt-dpad disabled:cursor-not-allowed disabled:opacity-40 ${a.label === '■' ? 'bt-stop' : ''}`}
                     disabled={activeMode !== 'manual'}
-                    onMouseDown={() => setVector(a.vec)}
-                    onMouseUp={() => setVector({ x: 0, y: 0 })}
-                    onMouseLeave={() => setVector({ x: 0, y: 0 })}
-                    onTouchStart={() => setVector(a.vec)}
-                    onTouchEnd={() => setVector({ x: 0, y: 0 })}
+                    onPointerDown={() => applyDriveVector(a.vec)}
+                    onPointerUp={() => applyDriveVector({ x: 0, y: 0 })}
+                    onPointerLeave={() => applyDriveVector({ x: 0, y: 0 })}
+                    onPointerCancel={() => applyDriveVector({ x: 0, y: 0 })}
                   >
                     {a.label}
                   </button>
