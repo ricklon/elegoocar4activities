@@ -3,7 +3,6 @@
  * Based on ELEGOO firmware, face detection removed for compatibility
  */
 #include "CameraWebServer_AP.h"
-#include "board_profile.h"
 #include <WiFi.h>
 #include "esp_camera.h"
 
@@ -87,6 +86,16 @@ void SocketServer_Test(void)
         }
         Heartbeat_time = millis();
       }
+      static unsigned long Test_time = 0;
+      if (millis() - Test_time > 1000)
+      {
+        Test_time = millis();
+        if (0 == (WiFi.softAPgetStationNum()))
+        {
+          Serial2.print("{\"N\":100}");
+          break;
+        }
+      }
     }
     Serial2.print("{\"N\":100}");
     client.stop();
@@ -105,15 +114,13 @@ void SocketServer_Test(void)
 void setup()
 {
   Serial.begin(115200);
-  Serial.printf("Board profile: %s\r\n", CAR_BOARD_PROFILE_LABEL);
-  Serial.printf("Serial2 RX=%d TX=%d\r\n", CAR_UART_RX_PIN, CAR_UART_TX_PIN);
-  Serial2.begin(9600, SERIAL_8N1, CAR_UART_RX_PIN, CAR_UART_TX_PIN);
+  // ESP32-S3: RX2=GPIO3, TX2=GPIO1 (GPIO4 conflicts with camera I2C)
+  Serial2.begin(9600, SERIAL_8N1, 3, 1);
   CameraWebServerAP.CameraWebServer_AP_Init();
   server.begin();
 }
 
 void loop()
 {
-  CameraWebServerAP.CameraWebServer_AP_Loop();
   SocketServer_Test();
 }

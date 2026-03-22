@@ -33,8 +33,6 @@ public: /*CMD*/
   void CMD_UltrasoundModuleStatus_xxx0(uint8_t is_get);
   void CMD_TraceModuleStatus_xxx0(uint8_t is_get);
   void CMD_Car_LeaveTheGround_xxx0(uint8_t is_get);
-  void CMD_IMUModuleStatus_xxx0(uint8_t is_get);
-  void CMD_BatteryVoltage_xxx0(void);
 
   void CMD_inspect_xxx0(void);
   void CMD_MotorControl_xxx0(void);

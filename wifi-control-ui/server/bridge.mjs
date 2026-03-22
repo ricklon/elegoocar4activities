@@ -172,6 +172,30 @@ function processCarFrame(frame) {
       broadcast({ type: 'telemetry', data: { onGround: val === 'true' } });
     }
   }
+  if (parsed.key === 'AX') {
+    broadcast({ type: 'telemetry', data: { imuAx: parsed.number } });
+  }
+  if (parsed.key === 'AY') {
+    broadcast({ type: 'telemetry', data: { imuAy: parsed.number } });
+  }
+  if (parsed.key === 'AZ') {
+    broadcast({ type: 'telemetry', data: { imuAz: parsed.number } });
+  }
+  if (parsed.key === 'GX') {
+    broadcast({ type: 'telemetry', data: { imuGx: parsed.number } });
+  }
+  if (parsed.key === 'GY') {
+    broadcast({ type: 'telemetry', data: { imuGy: parsed.number } });
+  }
+  if (parsed.key === 'GZ') {
+    broadcast({ type: 'telemetry', data: { imuGz: parsed.number } });
+  }
+  if (parsed.key === 'YW') {
+    broadcast({ type: 'telemetry', data: { imuYawCdeg: parsed.number } });
+  }
+  if (parsed.key === 'BV') {
+    broadcast({ type: 'telemetry', data: { batteryCentiV: parsed.number } });
+  }
 }
 
 function parseReply(frame) {
@@ -205,18 +229,27 @@ function probesForMode(mode) {
   // Keep it out of auto modes so line/obstacle/follow can continue running.
   if (mode === 'line' || mode === 'obstacle' || mode === 'follow') {
     return [
+      { N: 25, H: 'BV' },
       { N: 21, D1: 1, H: 'UO' },
       { N: 21, D1: 2, H: 'US' },
       { N: 23, H: 'GR' }
     ];
   }
   return [
+    { N: 25, H: 'BV' },
     { N: 21, D1: 1, H: 'UO' },
     { N: 21, D1: 2, H: 'US' },
     { N: 22, D1: 0, H: 'IL' },
     { N: 22, D1: 1, H: 'IM' },
     { N: 22, D1: 2, H: 'IR' },
-    { N: 23, H: 'GR' }
+    { N: 23, H: 'GR' },
+    { N: 24, D1: 1, H: 'AX' },
+    { N: 24, D1: 2, H: 'AY' },
+    { N: 24, D1: 3, H: 'AZ' },
+    { N: 24, D1: 4, H: 'GX' },
+    { N: 24, D1: 5, H: 'GY' },
+    { N: 24, D1: 6, H: 'GZ' },
+    { N: 24, D1: 7, H: 'YW' }
   ];
 }
 

@@ -22,9 +22,12 @@ const MODE_CODE = {
 
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('car-ui-theme') || 'bigtrak');
-  const [bridgeHost, setBridgeHost] = useState('localhost:8787');
-  const [carHost, setCarHost] = useState('192.168.4.1');
-  const [tcpPort, setTcpPort] = useState(100);
+  const [bridgeHost, setBridgeHost] = useState(() => localStorage.getItem('car-ui-bridge-host') || 'localhost:8787');
+  const [carHost, setCarHost] = useState(() => localStorage.getItem('car-ui-car-host') || '192.168.4.1');
+  const [tcpPort, setTcpPort] = useState(() => {
+    const saved = Number(localStorage.getItem('car-ui-tcp-port'));
+    return Number.isFinite(saved) && saved > 0 ? saved : 100;
+  });
   const [bridgeConnected, setBridgeConnected] = useState(false);
   const [carConnected, setCarConnected] = useState(false);
   const [lastFrame, setLastFrame] = useState('');
@@ -36,13 +39,21 @@ export default function App() {
     irMid: null,
     irRight: null,
     onGround: null,
+    batteryCentiV: null,
+    imuAx: null,
+    imuAy: null,
+    imuAz: null,
+    imuGx: null,
+    imuGy: null,
+    imuGz: null,
+    imuYawCdeg: null,
     linkRxFrames: 0,
     linkParseMisses: 0,
     linkLastFrameAt: null,
     updatedAt: null
   });
   const [driveCfg, setDriveCfg] = useState({
-    sendIntervalMs: 120,
+    sendIntervalMs: 80,
     minSpeed: 45,
     maxSpeed: 210,
     deadZone: 0.2
@@ -70,6 +81,18 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme === 'bigtrak' ? 'bigtrak' : 'default');
     localStorage.setItem('car-ui-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('car-ui-bridge-host', bridgeHost);
+  }, [bridgeHost]);
+
+  useEffect(() => {
+    localStorage.setItem('car-ui-car-host', carHost);
+  }, [carHost]);
+
+  useEffect(() => {
+    localStorage.setItem('car-ui-tcp-port', String(tcpPort));
+  }, [tcpPort]);
 
   const connectBridge = () => {
     wsRef.current?.close();
@@ -116,6 +139,21 @@ export default function App() {
     const ws = wsRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     ws.send(JSON.stringify({ type: 'send-json', payload }));
+  };
+
+  const sendDriveVectorNow = (nextVector) => {
+    if (activeMode !== 'manual') return;
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    const cmd = driveCommandFromVector(nextVector.x, nextVector.y, driveCfg);
+    const body = JSON.stringify(cmd);
+    lastCommandRef.current = body;
+    ws.send(JSON.stringify({ type: 'send-json', payload: cmd }));
+  };
+
+  const applyDriveVector = (nextVector) => {
+    setVector(nextVector);
+    sendDriveVectorNow(nextVector);
   };
 
   const stopCar = () => {
@@ -165,12 +203,11 @@ export default function App() {
   };
 
   const turnSelectedModeOff = () => {
-    if (selectedMode === 'manual') {
+    if (activeMode === 'manual') {
       switchToManualMode('manual turned off');
       return;
     }
-    if (activeMode !== selectedMode) return;
-    switchToManualMode(`${modeLabel(selectedMode)} turned off`);
+    switchToManualMode(`${modeLabel(activeMode)} turned off`);
   };
 
   useEffect(() => {
@@ -193,15 +230,15 @@ export default function App() {
     const onDown = (e) => {
       if (activeMode !== 'manual') return;
       if (e.repeat) return;
-      if (e.key === 'ArrowUp') setVector({ x: 0, y: -1 });
-      if (e.key === 'ArrowDown') setVector({ x: 0, y: 1 });
-      if (e.key === 'ArrowLeft') setVector({ x: -1, y: 0 });
-      if (e.key === 'ArrowRight') setVector({ x: 1, y: 0 });
-      if (e.key === ' ') setVector({ x: 0, y: 0 });
+      if (e.key === 'ArrowUp') applyDriveVector({ x: 0, y: -1 });
+      if (e.key === 'ArrowDown') applyDriveVector({ x: 0, y: 1 });
+      if (e.key === 'ArrowLeft') applyDriveVector({ x: -1, y: 0 });
+      if (e.key === 'ArrowRight') applyDriveVector({ x: 1, y: 0 });
+      if (e.key === ' ') applyDriveVector({ x: 0, y: 0 });
     };
     const onUp = (e) => {
       if (activeMode !== 'manual') return;
-      if (e.key.startsWith('Arrow') || e.key === ' ') setVector({ x: 0, y: 0 });
+      if (e.key.startsWith('Arrow') || e.key === ' ') applyDriveVector({ x: 0, y: 0 });
     };
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup', onUp);
@@ -209,7 +246,7 @@ export default function App() {
       window.removeEventListener('keydown', onDown);
       window.removeEventListener('keyup', onUp);
     };
-  }, [activeMode]);
+  }, [activeMode, driveCfg]);
 
   useEffect(() => {
     if (!isRecording) return;
@@ -231,6 +268,14 @@ export default function App() {
         ir_mid: telemetry.irMid ?? '',
         ir_right: telemetry.irRight ?? '',
         on_ground: telemetry.onGround ?? '',
+        battery_centi_v: telemetry.batteryCentiV ?? '',
+        imu_ax: telemetry.imuAx ?? '',
+        imu_ay: telemetry.imuAy ?? '',
+        imu_az: telemetry.imuAz ?? '',
+        imu_gx: telemetry.imuGx ?? '',
+        imu_gy: telemetry.imuGy ?? '',
+        imu_gz: telemetry.imuGz ?? '',
+        imu_yaw_cdeg: telemetry.imuYawCdeg ?? '',
         link_rx_frames: telemetry.linkRxFrames ?? '',
         link_parse_misses: telemetry.linkParseMisses ?? ''
       });
@@ -399,7 +444,7 @@ export default function App() {
         <section className="grid gap-4">
           <div className="panel">
             <h2 className="mb-2 text-lg font-semibold">Control</h2>
-            <Joystick onChange={setVector} disabled={activeMode !== 'manual'} />
+            <Joystick onChange={applyDriveVector} disabled={activeMode !== 'manual'} />
             <div className="mx-auto mt-3 grid w-44 grid-cols-3 gap-2">
               {dpad.map((a, i) =>
                 a ? (
@@ -407,11 +452,10 @@ export default function App() {
                     key={`${a.label}-${i}`}
                     className={`bt-dpad disabled:cursor-not-allowed disabled:opacity-40 ${a.label === '■' ? 'bt-stop' : ''}`}
                     disabled={activeMode !== 'manual'}
-                    onMouseDown={() => setVector(a.vec)}
-                    onMouseUp={() => setVector({ x: 0, y: 0 })}
-                    onMouseLeave={() => setVector({ x: 0, y: 0 })}
-                    onTouchStart={() => setVector(a.vec)}
-                    onTouchEnd={() => setVector({ x: 0, y: 0 })}
+                    onPointerDown={() => applyDriveVector(a.vec)}
+                    onPointerUp={() => applyDriveVector({ x: 0, y: 0 })}
+                    onPointerLeave={() => applyDriveVector({ x: 0, y: 0 })}
+                    onPointerCancel={() => applyDriveVector({ x: 0, y: 0 })}
                   >
                     {a.label}
                   </button>
@@ -826,6 +870,8 @@ function ChallengeCard({ title, objective, setup, metricLabel, metricValue, reco
 }
 
 function SensorExplorer({ telemetry, lastFrame, activeMode }) {
+  const batteryVolts =
+    Number.isFinite(telemetry.batteryCentiV) ? `${(telemetry.batteryCentiV / 100).toFixed(2)} V` : '---';
   return (
     <div className="panel">
       <h2 className="mb-2 text-lg font-semibold">Sensor Explorer</h2>
@@ -853,7 +899,23 @@ function SensorExplorer({ telemetry, lastFrame, activeMode }) {
         <SensorGroup
           title="Safety / Chassis"
           subtitle="Ground contact and stop safety context"
-          rows={[{ label: 'On Ground', value: boolTxt(telemetry.onGround) }]}
+          rows={[
+            { label: 'On Ground', value: boolTxt(telemetry.onGround) },
+            { label: 'Battery', value: batteryVolts }
+          ]}
+        />
+        <SensorGroup
+          title="IMU / MPU6050"
+          subtitle="Raw accelerometer and gyroscope readings from the UNO"
+          rows={[
+            { label: 'Accel X', value: fmt(telemetry.imuAx) },
+            { label: 'Accel Y', value: fmt(telemetry.imuAy) },
+            { label: 'Accel Z', value: fmt(telemetry.imuAz) },
+            { label: 'Gyro X', value: fmt(telemetry.imuGx) },
+            { label: 'Gyro Y', value: fmt(telemetry.imuGy) },
+            { label: 'Gyro Z', value: fmt(telemetry.imuGz) },
+            { label: 'Yaw (cdeg)', value: fmt(telemetry.imuYawCdeg) }
+          ]}
         />
         <SensorGroup
           title="Link / Protocol"
@@ -874,8 +936,6 @@ function SensorExplorer({ telemetry, lastFrame, activeMode }) {
           title="Not Exposed by Current Firmware"
           subtitle="Requires UNO protocol/firmware extension"
           rows={[
-            { label: 'Battery Voltage', value: 'not exposed', muted: true },
-            { label: 'IMU Tilt/Accel', value: 'not exposed', muted: true },
             { label: 'Motor PWM / Wheel Speed', value: 'not exposed', muted: true }
           ]}
         />
