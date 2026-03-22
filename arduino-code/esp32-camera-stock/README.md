@@ -14,9 +14,11 @@ This directory preserves stock vendor ESP32 camera firmware baselines inside the
   - stock simplified WROVER camera/socket firmware copied from the ELEGOO package
 - `wrover/ESP32_CameraServer_AP_20220120/`
   - older stock WROVER firmware copied from the ELEGOO package
-- `s3/ESP32_CameraServer_AP_simple_local_vendor/`
-  - provisional stock S3 baseline copied from the local vendor-provided classroom project bundle
-  - this is not yet confirmed against a public official upstream URL
+- `s3/ESP32_CameraServer_AP_2023_V1.3_vendor_s3/`
+  - authoritative stock S3 baseline copied from the ELEGOO 2024.01.30 package
+  - matches the newer ESP32-S3-WROOM-1 camera kits
+- `s3/ESP32_CameraServer_AP_simple_vendor_s3/`
+  - older provisional local-vendor S3 baseline kept only for archival comparison
 
 ## Project Working Copy
 
@@ -26,5 +28,6 @@ This directory preserves stock vendor ESP32 camera firmware baselines inside the
 ## Notes
 
 - the stock WROVER trees should stay unchanged unless we add explicit archival notes
-- the S3 tree here is a local-vendor baseline, not a public-official baseline
-- if a public official S3 package is found later, it should replace or sit beside this provisional S3 baseline with clear labeling
+- the `ESP32_CameraServer_AP_2023_V1.3_vendor_s3` tree is now the preferred S3 stock baseline for newer kits
+- the older `ESP32_CameraServer_AP_simple_vendor_s3` tree is retained only as an archival reference
+- the preferred project S3 working copy should follow the vendor V1.3 wiring assumptions for newer kits, including `Serial2 RX=3` and `TX=40`

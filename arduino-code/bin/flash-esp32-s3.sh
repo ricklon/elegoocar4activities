@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SKETCH_PATH="$ROOT_DIR/arduino-code/esp32-camera/ESP32_CameraServer_AP_simple/ESP32_CameraServer_AP_simple.ino"
 DEFAULT_PORT="/dev/ttyACM0"
-FQBN="esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc"
+FQBN="esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc"
 
 resolve_arduino_cli() {
   if [[ -x "${HOME}/mymachine/bin/arduino-cli" ]]; then

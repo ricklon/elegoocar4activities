@@ -79,13 +79,13 @@ Related host-side control stack (outside this folder):
 ### ESP32-S3 compile (camera firmware)
 
 ```bash
-./bin/arduino-cli compile --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc "arduino-code/esp32-camera/ESP32_CameraServer_AP_simple"
+./bin/arduino-cli compile --fqbn esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc "arduino-code/esp32-camera/ESP32_CameraServer_AP_simple"
 ```
 
 ### ESP32-S3 upload (example port)
 
 ```bash
-./bin/arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc "arduino-code/esp32-camera/ESP32_CameraServer_AP_simple"
+./bin/arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc "arduino-code/esp32-camera/ESP32_CameraServer_AP_simple"
 ```
 
 ## Testing Priorities
