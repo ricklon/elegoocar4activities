@@ -39,6 +39,7 @@ export default function App() {
     irMid: null,
     irRight: null,
     onGround: null,
+    batteryCentiV: null,
     imuAx: null,
     imuAy: null,
     imuAz: null,
@@ -253,6 +254,7 @@ export default function App() {
         ir_mid: telemetry.irMid ?? '',
         ir_right: telemetry.irRight ?? '',
         on_ground: telemetry.onGround ?? '',
+        battery_centi_v: telemetry.batteryCentiV ?? '',
         imu_ax: telemetry.imuAx ?? '',
         imu_ay: telemetry.imuAy ?? '',
         imu_az: telemetry.imuAz ?? '',
@@ -855,6 +857,8 @@ function ChallengeCard({ title, objective, setup, metricLabel, metricValue, reco
 }
 
 function SensorExplorer({ telemetry, lastFrame, activeMode }) {
+  const batteryVolts =
+    Number.isFinite(telemetry.batteryCentiV) ? `${(telemetry.batteryCentiV / 100).toFixed(2)} V` : '---';
   return (
     <div className="panel">
       <h2 className="mb-2 text-lg font-semibold">Sensor Explorer</h2>
@@ -882,7 +886,10 @@ function SensorExplorer({ telemetry, lastFrame, activeMode }) {
         <SensorGroup
           title="Safety / Chassis"
           subtitle="Ground contact and stop safety context"
-          rows={[{ label: 'On Ground', value: boolTxt(telemetry.onGround) }]}
+          rows={[
+            { label: 'On Ground', value: boolTxt(telemetry.onGround) },
+            { label: 'Battery', value: batteryVolts }
+          ]}
         />
         <SensorGroup
           title="IMU / MPU6050"
@@ -916,7 +923,6 @@ function SensorExplorer({ telemetry, lastFrame, activeMode }) {
           title="Not Exposed by Current Firmware"
           subtitle="Requires UNO protocol/firmware extension"
           rows={[
-            { label: 'Battery Voltage', value: 'not exposed', muted: true },
             { label: 'Motor PWM / Wheel Speed', value: 'not exposed', muted: true }
           ]}
         />

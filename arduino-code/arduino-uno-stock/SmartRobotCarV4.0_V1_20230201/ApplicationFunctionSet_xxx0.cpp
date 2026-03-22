@@ -1613,75 +1613,6 @@ void ApplicationFunctionSet::CMD_TraceModuleStatus_xxx0(uint8_t is_get)
   Application_SmartRobotCarxxx0.Functional_Mode = CMD_Programming_mode; /*set mode to programming mode<Waiting for the next set of control commands>*/
 }
 
-/*
-  N24:command
-  CMD mode：MPU6050 telemetry feedback.
-  Input：
-*/
-void ApplicationFunctionSet::CMD_IMUModuleStatus_xxx0(uint8_t is_get)
-{
-  int16_t ax, ay, az, gx, gy, gz;
-  long value = 0;
-
-  AppMPU6050getdata.MPU6050_dveGetRawData(&ax, &ay, &az, &gx, &gy, &gz);
-
-  if (1 == is_get)
-  {
-    value = ax;
-  }
-  else if (2 == is_get)
-  {
-    value = ay;
-  }
-  else if (3 == is_get)
-  {
-    value = az;
-  }
-  else if (4 == is_get)
-  {
-    value = gx;
-  }
-  else if (5 == is_get)
-  {
-    value = gy;
-  }
-  else if (6 == is_get)
-  {
-    value = gz;
-  }
-  else if (7 == is_get)
-  {
-    float yaw = 0.0;
-    AppMPU6050getdata.MPU6050_dveGetEulerAngles(&yaw);
-    value = (long)(yaw * 100.0f);
-  }
-
-#if _is_print
-  Serial.print('{');
-  Serial.print(CommandSerialNumber);
-  Serial.print('_');
-  Serial.print(value);
-  Serial.print('}');
-#endif
-}
-
-/*
-  N25:command
-  CMD mode：battery voltage telemetry feedback.
-*/
-void ApplicationFunctionSet::CMD_BatteryVoltage_xxx0(void)
-{
-  long value = (long)(VoltageData_V * 100.0f);
-
-#if _is_print
-  Serial.print('{');
-  Serial.print(CommandSerialNumber);
-  Serial.print('_');
-  Serial.print(value);
-  Serial.print('}');
-#endif
-}
-
 /* 
  * End:CMD
  * Graphical programming and command control module
@@ -1983,14 +1914,6 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
           Serial.print('{' + CommandSerialNumber + "_true}");
 #endif
         }
-        break;
-
-      case 24: /*<Command：N 24>：IMU telemetry */
-        CMD_IMUModuleStatus_xxx0(doc["D1"]);
-        break;
-
-      case 25: /*<Command：N 25>：Battery voltage telemetry */
-        CMD_BatteryVoltage_xxx0();
         break;
 
       case 110:                                                                                 /*<Command：N 110> */

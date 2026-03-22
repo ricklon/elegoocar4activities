@@ -193,6 +193,9 @@ function processCarFrame(frame) {
   if (parsed.key === 'YW') {
     broadcast({ type: 'telemetry', data: { imuYawCdeg: parsed.number } });
   }
+  if (parsed.key === 'BV') {
+    broadcast({ type: 'telemetry', data: { batteryCentiV: parsed.number } });
+  }
 }
 
 function parseReply(frame) {
@@ -226,12 +229,14 @@ function probesForMode(mode) {
   // Keep it out of auto modes so line/obstacle/follow can continue running.
   if (mode === 'line' || mode === 'obstacle' || mode === 'follow') {
     return [
+      { N: 25, H: 'BV' },
       { N: 21, D1: 1, H: 'UO' },
       { N: 21, D1: 2, H: 'US' },
       { N: 23, H: 'GR' }
     ];
   }
   return [
+    { N: 25, H: 'BV' },
     { N: 21, D1: 1, H: 'UO' },
     { N: 21, D1: 2, H: 'US' },
     { N: 22, D1: 0, H: 'IL' },

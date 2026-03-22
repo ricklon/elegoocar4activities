@@ -1,4 +1,8 @@
+#if defined(CONFIG_IDF_TARGET_ESP32)
 #define CAMERA_MODEL_M5STACK_WIDE
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+#define CAMERA_MODEL_ESP32_S3
+#endif
 
 #include "CameraWebServer_AP.h"
 #include "camera_pins.h"
@@ -62,12 +66,13 @@ void CameraWebServer_AP::CameraWebServer_AP_Init(void)
   sensor_t *s = esp_camera_sensor_get();
   s->set_framesize(s, FRAMESIZE_VGA);
 
-#if defined(CAMERA_MODEL_M5STACK_WIDE)
+#if defined(CONFIG_IDF_TARGET_ESP32)
   s->set_vflip(s, 0);
-  s->set_hmirror(s, 1);
-#endif
+  s->set_hmirror(s, 0);
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
   s->set_vflip(s, 1);
   s->set_hmirror(s, 0);
+#endif
 
   Serial.println("\r\n");
 

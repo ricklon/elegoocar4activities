@@ -23,6 +23,7 @@ Commands used by UI/bridge and required in UNO parser:
 - `N=22` IR telemetry (`D1=0/1/2` left/mid/right)
 - `N=23` ground safety status
 - `N=24` IMU telemetry (`D1=1..3 accel`, `4..6 gyro`, `7 yaw cdeg`)
+- `N=25` battery telemetry (`BV` centivolts)
 
 Reply frame format required by bridge:
 - `{<H>_<value>}` (examples: `{US_37}`, `{UO_true}`, `{GR_false}`)
@@ -57,6 +58,7 @@ Heartbeat contract required between bridge and ESP32:
 ## 5a) IMU Telemetry Extension Audit (2026-03-21)
 
 - UNO compile with `N=24` IMU telemetry: `PASS`
+- UNO compile with `N=24` IMU telemetry and `N=25` battery telemetry: `PASS`
   - Size: `31670` bytes program (`98%`)
   - Globals: `1204` bytes (`58%`)
 - Bridge/UI support added for:

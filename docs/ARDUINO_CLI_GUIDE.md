@@ -164,7 +164,7 @@ Check the chip markings on your camera module.
 
 | Firmware | ESP32-WROVER | ESP32-S3 | Notes |
 |----------|--------------|----------|-------|
-| `ESP32_CameraServer_AP_simple` | ✗ | ✓ | Use this for ESP32-S3 |
+| `ESP32_CameraServer_AP_simple` | ✓ | ✓ | Project firmware now supports both targets with board-specific UART pins |
 | `ESP32_CameraServer_AP_20220120` | ✓ | ✗ | Face detection requires old API |
 
 The original firmware uses `fd_forward.h` face detection API which is not available for ESP32-S3. ESP32-S3 uses a different face detection library (`esp-dl`) which requires significant code changes.
@@ -188,6 +188,25 @@ arduino-cli compile --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=op
 arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc "$ESP32_FIRMWARE_PATH"
 ```
 
+Project helper script:
+
+```bash
+bash arduino-code/bin/flash-esp32-s3.sh
+```
+
+### Compile and Upload for ESP32-WROVER
+
+```bash
+arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app,PSRAM=enabled "$ESP32_FIRMWARE_PATH"
+arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=huge_app,PSRAM=enabled "$ESP32_FIRMWARE_PATH"
+```
+
+Project helper script:
+
+```bash
+bash arduino-code/bin/flash-esp32-wrover.sh
+```
+
 ### ESP32-S3 Bootloader Mode
 
 ESP32-S3 requires manual bootloader entry:
@@ -208,12 +227,21 @@ stty -F /dev/ttyACM0 115200 raw -echo
 cat /dev/ttyACM0
 ```
 
-### ESP32-S3 Camera Pin Configuration
+### ESP32 Camera / UART Board Profiles
 
-The ESP32-S3 uses different camera pins than ESP32-WROVER. The simplified firmware already has correct pins:
+The project firmware now selects UART pins by target:
 
 ```cpp
-// ESP32-S3 (ELEGOO variant)
+// ESP32-WROVER
+Serial2.begin(9600, SERIAL_8N1, 3, 1);   // ELEGOO simplified firmware mapping used by project
+
+// ESP32-S3
+Serial2.begin(9600, SERIAL_8N1, 3, 1);   // RX=GPIO3, TX=GPIO1
+```
+
+The camera pins in the simplified firmware are shared across the project board variants:
+
+```cpp
 #define PWDN_GPIO_NUM     -1
 #define RESET_GPIO_NUM    -1
 #define XCLK_GPIO_NUM     15

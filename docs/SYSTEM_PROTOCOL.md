@@ -519,6 +519,22 @@ Notes:
 - `YW` is emitted in centi-degrees to keep the UNO reply lightweight on AVR
 - current bridge polling requests IMU telemetry only in manual mode
 
+### `N=25` battery telemetry
+
+Request:
+
+- `{"N":25,"H":"BV"}`
+
+Reply:
+
+- `{BV_<value>}`
+
+Notes:
+
+- `BV` is battery voltage in centivolts
+- example: `{BV_742}` means `7.42 V`
+- the bridge polls battery telemetry in both manual and auto modes
+
 ### `N=100` standby / stop
 
 Request:
@@ -615,6 +631,7 @@ Parsed keys are mapped as follows:
 - `GY` -> `telemetry.imuGy`
 - `GZ` -> `telemetry.imuGz`
 - `YW` -> `telemetry.imuYawCdeg`
+- `BV` -> `telemetry.batteryCentiV`
 
 All parsed and unparsed non-heartbeat frames are still forwarded to the browser as raw `frame` messages.
 
