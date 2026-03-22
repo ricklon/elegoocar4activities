@@ -21,7 +21,8 @@ The ESP32 now has two operating modes:
 
 In both modes, the browser UI still talks to the local bridge first:
 
-- `Bridge Host:Port = localhost:8787`
+- `Bridge Host:Port = localhost:8787` only when the browser is on the same machine as the bridge
+- otherwise use `<bridge-host-lan-ip>:8787`
 - `Car TCP Port = 100`
 
 ## Fast Recovery Checklist
@@ -218,8 +219,11 @@ arduino-cli compile --fqbn esp32:esp32:esp32s3:PSRAM=opi,CDCOnBoot=cdc sketch
 | USB | External USB-serial chip | Native USB (CDC) |
 | Device path | `/dev/ttyUSB*` | `/dev/ttyACM*` |
 | PSRAM option | `PSRAM=enabled` | `PSRAM=opi` |
+| Recommended flash size/partition | `huge_app` | `FlashSize=8M,PartitionScheme=default_8MB` |
 | Camera pins | Different | Different |
 | Face detection | `fd_forward.h` | `esp-dl` library |
+
+For newer ELEGOO S3 kits, the authoritative baseline is the `2024.01.30` vendor package, not the older public WROVER GitHub package.
 
 ### 3. Original Firmware Incompatible with ESP32-S3
 
@@ -244,7 +248,7 @@ fatal error: fd_forward.h: No such file or directory
 --fqbn esp32:esp32:esp32:PartitionScheme=huge_app,PSRAM=enabled
 
 # ESP32-S3
---fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi
+--fqbn esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi
 ```
 
 Check available options:
@@ -259,10 +263,10 @@ Use the current project firmware sketch:
 
 ```bash
 # Compile
-arduino-cli compile --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc arduino-code/esp32-camera/ESP32_CameraServer_AP_simple
+arduino-cli compile --fqbn esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc arduino-code/esp32-camera/ESP32_CameraServer_AP_simple
 
 # Upload (enter bootloader mode first)
-arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc arduino-code/esp32-camera/ESP32_CameraServer_AP_simple
+arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc arduino-code/esp32-camera/ESP32_CameraServer_AP_simple
 
 # Monitor output
 cat /dev/ttyACM0
@@ -287,24 +291,20 @@ timeout 10 cat /dev/ttyACM0
 - Camera I2C data (SIOD) - required for camera communication
 - Serial2 TX - used for Arduino UNO communication (on original ESP32-WROVER)
 
-**Solution for ESP32-S3:**
+**Solution by hardware revision:**
 
-ESP32-S3 uses different Serial2 pins than ESP32-WROVER:
+| Board | Serial2 TX | Serial2 RX | Note |
+|-------|------------|------------|------|
+| ESP32-WROVER | GPIO 4 | GPIO 33 | original WROVER project path |
+| Older provisional S3 assumption | GPIO 1 | GPIO 3 | not correct for newer vendor S3 kits |
+| Newer vendor S3 (`V1.3`) | GPIO 40 | GPIO 3 | correct for newer ESP32-S3-WROOM-1 kits |
 
-| Board | Serial2 TX | Serial2 RX |
-|-------|------------|------------|
-| ESP32-WROVER | GPIO 4 | GPIO 33 |
-| ESP32-S3 | GPIO 1 | GPIO 3 |
-
-Use this configuration for ESP32-S3:
+Use this configuration for the newer vendor S3 kits:
 ```cpp
-Serial2.begin(9600, SERIAL_8N1, 3, 1);  // RX=GPIO3, TX=GPIO1
+Serial2.begin(9600, SERIAL_8N1, 3, 40);  // RX=GPIO3, TX=GPIO40
 ```
 
-**Why GPIO 1/3 work on ESP32-S3:**
-- ESP32-WROVER uses GPIO 1/3 for USB-serial (UART0)
-- ESP32-S3 uses GPIO 43/44 for native USB (USB CDC)
-- GPIO 1/3 are available on ESP32-S3 for Serial2
+This was a key lesson from hardware validation: the newer S3 vendor baseline does not use `TX=1`.
 
 ### Camera Pins Used by ESP32-S3
 | Pin | Camera Signal |

@@ -53,7 +53,7 @@ Related host-side control stack (outside this folder):
 
 - On ESP32-S3 camera variant, camera I2C uses GPIO4.
 - Do **not** place Serial2 TX on GPIO4.
-- This project uses `Serial2.begin(9600, SERIAL_8N1, 3, 1)` in ESP32 sketch.
+- For newer vendor S3 kits this project uses `Serial2.begin(9600, SERIAL_8N1, 3, 40)` in the ESP32 sketch.
 
 ### 2) N22 side effect
 

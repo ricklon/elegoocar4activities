@@ -13,6 +13,7 @@ This project is an alternative to the default ELEGOO Android app:
 - It provides a web-based interface for anyone who can join the car network.
 - It exposes telemetry/data, car modes, and control features in a browser UI.
 - It retains compatibility with stock vehicle behavior and requires no firmware changes for core use.
+- It now supports both older `ESP32-WROVER + MPU6050` kits and newer `ESP32-S3-WROOM-1 + QMI8658C` kits.
 
 Existing control paths still work:
 - IR remote support remains available.
@@ -74,9 +75,9 @@ If both commands print versions, you are ready to run the project.
 ## Runtime Topology
 
 1. Browser UI <-> WebSocket bridge (`ws://<host>:8787`)
-2. Bridge <-> ESP32 socket (`192.168.4.1:100`)
+2. Bridge <-> ESP32 socket (`<car-host>:100`)
 3. ESP32 <-> UNO over UART
-4. Camera stream (`http://192.168.4.1:81/stream`)
+4. Camera stream (`http://<car-host>:81/stream`)
 
 ## Repository Layout
 
@@ -145,11 +146,13 @@ More classroom activities and mode-based workflows are documented in:
 ## Compatibility and Roadmap
 
 - Current state:
-  - Compatible with existing ELEGOO firmware/control model.
+  - Compatible with the existing ELEGOO firmware/control model.
+  - Supports both older WROVER/MPU kits and newer S3/QMI kits.
   - Supports connecting to different cars by changing host/IP in the UI.
+  - Project firmware exposes IMU and battery telemetry in the web UI.
 - Planned/desired improvements:
-  - Add support for more telemetry (for example, IMU and other currently unexposed data).
   - Improve multi-car networking so many cars can operate on a shared network more easily.
+  - Add a clearer release process and release notes per verified classroom build.
 
 ## Notes
 

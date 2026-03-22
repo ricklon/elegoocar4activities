@@ -16,6 +16,12 @@ npm -v
 
 ## 1. Power + Network
 
+Hardware note:
+
+- Older kits may use `ESP32-WROVER + MPU6050`
+- Newer kits may use `ESP32-S3-WROOM-1 + QMI8658C`
+- The UI workflow is the same, but make sure the flashed firmware matches the hardware variant
+
 Choose the network mode that matches the current ESP32 state.
 
 ### Option A. Car fallback AP mode
@@ -87,7 +93,8 @@ Open the UI using the local/LAN URL printed by Vite.
 ## 3. Connect in UI
 
 Set:
-- Bridge Host:Port = `localhost:8787` (or laptop IP for phone clients)
+- Bridge Host:Port = `localhost:8787` when the browser runs on the same machine as the bridge
+- Bridge Host:Port = `<laptop-lan-ip>:8787` when the browser runs on another device
 - Car Host =:
   - `192.168.4.1` in fallback AP mode
   - `<car-lan-ip>` in local network mode
@@ -127,6 +134,6 @@ Expected:
 
 - If `Car TCP` drops: restart bridge and reconnect.
 - If the ESP32 falls back to AP mode: join `ELEGOO-...` and set Car Host back to `192.168.4.1`.
-- If the ESP32 is on your LAN: keep Bridge Host at `localhost:8787`, but set Car Host to the ESP32 LAN IP.
+- If the ESP32 is on your LAN: keep Bridge Host at `localhost:8787` only when the browser is on the same machine as the bridge. Otherwise use the bridge host machine's LAN IP.
 - If camera works but car does not move: verify ESP32<->UNO UART wiring.
 - If obstacle mode seems inactive: ensure the mode is ON and bridge build includes mode-aware polling.

@@ -9,6 +9,11 @@ This checklist defines the firmware contract required for `wifi-control-ui` and 
 - UNO:
   - `arduino-code/arduino-uno/SmartRobotCarV4.0_V1_20230201_TB6612_MPU6050`
   - main sketch file: `SmartRobotCarV4.0_V1_20230201_TB6612_MPU6050.ino`
+  - older `MPU6050` kit path
+- UNO:
+  - `arduino-code/arduino-uno/SmartRobotCarV4.0_V2_20220322_TB6612_QMI8658C`
+  - main sketch file: `SmartRobotCarV4.0_V2_20220322_TB6612_QMI8658C.ino`
+  - newer `QMI8658C` kit path
 - ESP32-S3 camera/socket:
   - `arduino-code/esp32-camera/ESP32_CameraServer_AP_simple`
 
@@ -44,16 +49,19 @@ Heartbeat contract required between bridge and ESP32:
 - UNO FQBN:
   - `arduino:avr:uno`
 - ESP32-S3 FQBN:
-  - `esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc`
+  - `esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc`
 
-## 5) Compile Audit Result (2026-03-01)
+## 5) Compile Audit Result
 
-- ESP32-S3 compile: `PASS`
-  - Size: `792929` bytes program (`25%`)
+- ESP32-S3 compile with newer vendor settings: `PASS`
+  - Size: `804545` bytes program (`24%` of `3342336`)
   - Globals: `57816` bytes (`17%`)
-- UNO compile: `PASS`
+- UNO compile (`MPU6050` path): `PASS`
   - Size: `31250` bytes program (`96%`)
   - Globals: `1204` bytes (`58%`)
+- UNO compile (`QMI8658C` path with `N=24` and `N=25`): `PASS`
+  - Size: `31144` bytes program (`96%`)
+  - Globals: `1221` bytes (`59%`)
 
 ## 5a) IMU Telemetry Extension Audit (2026-03-21)
 
@@ -78,7 +86,7 @@ ESP32-S3 compile:
 
 ```bash
 "$CLI" compile --build-path /tmp/arduino-build-esp32 \
-  --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc \
+  --fqbn esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc \
   "arduino-code/esp32-camera/ESP32_CameraServer_AP_simple/ESP32_CameraServer_AP_simple.ino"
 ```
 

@@ -14,6 +14,7 @@ It is based on the current code in:
 - `wifi-control-ui/server/bridge.mjs`
 - `arduino-code/esp32-camera/ESP32_CameraServer_AP_simple/ESP32_CameraServer_AP_simple.ino`
 - `arduino-code/arduino-uno/SmartRobotCarV4.0_V1_20230201_TB6612_MPU6050/ApplicationFunctionSet_xxx0.cpp`
+- `arduino-code/arduino-uno/SmartRobotCarV4.0_V2_20220322_TB6612_QMI8658C/ApplicationFunctionSet_xxx0.cpp`
 
 ## 1. System Architecture
 
@@ -28,6 +29,9 @@ It is based on the current code in:
   - Runs motion control and autonomous modes
   - Parses JSON control commands
   - Emits short brace-delimited reply frames
+  - Exists in two supported project variants:
+    - older `MPU6050`
+    - newer `QMI8658C`
 - Client laptop or phone
   - Runs the React UI in a browser
   - Connects to a local Node bridge over WebSocket
@@ -59,7 +63,11 @@ It is based on the current code in:
    - raw TCP to `<car-host>:100`
    - default car host is `192.168.4.1`
 3. ESP32 -> UNO:
-   - `Serial2.begin(9600, SERIAL_8N1, 3, 1)`
+   - board-specific `Serial2` at `9600`
+   - WROVER project path:
+     - `Serial2.begin(9600, SERIAL_8N1, 33, 4)`
+   - newer S3 project path:
+     - `Serial2.begin(9600, SERIAL_8N1, 3, 40)`
 4. Camera stream:
    - `http://<car-host>:81/stream`
 

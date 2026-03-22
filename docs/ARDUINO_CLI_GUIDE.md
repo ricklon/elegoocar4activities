@@ -63,15 +63,18 @@ This project is a standalone curated workspace. Use the firmware copies under `a
 
 ```bash
 UNO_FIRMWARE_PATH="arduino-code/arduino-uno/SmartRobotCarV4.0_V1_20230201_TB6612_MPU6050"
+UNO_QMI_FIRMWARE_PATH="arduino-code/arduino-uno/SmartRobotCarV4.0_V2_20220322_TB6612_QMI8658C"
 ESP32_FIRMWARE_PATH="arduino-code/esp32-camera/ESP32_CameraServer_AP_simple"
 ```
 
-If you need other hardware variants (QMI8658C, DRV8835, etc.), use the original vendor package paths outside this workspace.
+Use:
+- `UNO_FIRMWARE_PATH` for older `MPU6050` kits
+- `UNO_QMI_FIRMWARE_PATH` for newer `QMI8658C` kits
 
 ## Connect the Arduino
 
 1. Connect Arduino UNO to computer via USB
-2. Power ON the robot car
+2. For uploads, keep the robot car battery `OFF`
 3. Verify the connection:
 
 ```bash
@@ -106,6 +109,12 @@ Project helper script:
 
 ```bash
 bash arduino-code/bin/flash-uno-imu.sh
+```
+
+Project helper script for newer QMI kits:
+
+```bash
+bash arduino-code/bin/flash-uno-qmi-imu.sh
 ```
 
 ## Important: Flash The UNO By Itself
@@ -218,10 +227,10 @@ arduino-cli core install esp32:esp32@2.0.14
 
 ```bash
 # Compile for ESP32-S3 with CDC enabled
-arduino-cli compile --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc "$ESP32_FIRMWARE_PATH"
+arduino-cli compile --fqbn esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc "$ESP32_FIRMWARE_PATH"
 
 # Upload
-arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:esp32s3:PartitionScheme=huge_app,PSRAM=opi,CDCOnBoot=cdc "$ESP32_FIRMWARE_PATH"
+arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc "$ESP32_FIRMWARE_PATH"
 ```
 
 Project helper script:
@@ -269,10 +278,10 @@ The project firmware now selects UART pins by target:
 
 ```cpp
 // ESP32-WROVER
-Serial2.begin(9600, SERIAL_8N1, 3, 1);   // ELEGOO simplified firmware mapping used by project
+Serial2.begin(9600, SERIAL_8N1, 33, 4);
 
-// ESP32-S3
-Serial2.begin(9600, SERIAL_8N1, 3, 1);   // RX=GPIO3, TX=GPIO1
+// ESP32-S3 (newer vendor V1.3 baseline)
+Serial2.begin(9600, SERIAL_8N1, 3, 40);  // RX=GPIO3, TX=GPIO40
 ```
 
 The camera pins in the simplified firmware are shared across the project board variants:
