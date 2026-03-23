@@ -1,8 +1,8 @@
-# ELEGOO Smart Robot Car V4.0 - Classroom FPV Control
+# SmartCar4Activities
 
 [Smart Robot Car Kit V4.0 (With Camera)](https://us.elegoo.com/products/elegoo-smart-robot-car-kit-v-4-0)
 
-This repository is a classroom-focused control stack for the ELEGOO Smart Robot Car V4.0.
+This repository is `smartcar4activities`, a classroom-focused control stack for the ELEGOO Smart Robot Car V4.0.
 It combines curated firmware copies with a browser FPV dashboard and a local bridge service.
 
 ## Default Behavior vs This Project

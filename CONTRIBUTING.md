@@ -2,7 +2,7 @@
 
 ## Scope
 
-Contribute within `classroom-fpv-project/` to keep custom work separated from upstream vendor package folders.
+Contribute within `smartcar4activities/` to keep custom work separated from upstream vendor package folders.
 
 ## Where to Make Changes
 

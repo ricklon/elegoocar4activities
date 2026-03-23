@@ -1,9 +1,9 @@
-# AGENTS.md - classroom-fpv-project
+# AGENTS.md - smartcar4activities
 
 ## Scope
 
 This file applies to everything under:
-- `classroom-fpv-project/`
+- `smartcar4activities/`
 
 This folder is the standalone project workspace (separate from vendor package roots).
 
