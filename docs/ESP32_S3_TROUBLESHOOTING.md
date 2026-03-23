@@ -14,6 +14,7 @@ The ESP32 now has two operating modes:
 - `LAN / STA mode`
   - The ESP32 joins a saved local Wi-Fi network.
   - Use the ESP32's LAN IP as `Car Host` in the UI.
+  - If a hostname was configured during AP setup and your network resolves mDNS, you can also use `<hostname>.local`.
 - `Fallback AP mode`
   - If the saved Wi-Fi network cannot be joined, the ESP32 starts its own AP.
   - This preserves the original ELEGOO workflow.
@@ -32,7 +33,7 @@ If the car is not reachable:
 1. Confirm the local bridge is running.
 2. Confirm whether the ESP32 is in LAN mode or fallback AP mode.
 3. Use the correct `Car Host`:
-   - LAN mode: the ESP32's LAN IP
+   - LAN mode: the ESP32's LAN IP or configured `.local` hostname
    - fallback AP mode: `192.168.4.1`
 4. Check whether the camera works at `/stream`.
 5. Check whether port `100` is reachable for car control.
@@ -53,41 +54,75 @@ What to do:
 2. Check whether it joined the LAN.
 3. Only expect the `ELEGOO-...` AP when saved Wi-Fi join fails.
 
-## Problem: Need To Find The ESP32 IP On The LAN
+## Recovery: Clear Saved Wi-Fi via Serial
 
-The most reliable identifier is the ESP32 MAC address:
+Use this when the car has saved credentials for a network you can no longer reach and the web UI is not accessible.
 
-- `30:ed:a0:1e:c4:38`
+Requirements: the car is connected to your machine via USB (the same cable used for flashing).
 
-Use the neighbor table first:
+Steps:
+
+1. Open a serial monitor at 115200 baud on the ESP32 port (`/dev/ttyACM0` for S3, `/dev/ttyUSB0` for WROVER).
+2. Power on or reset the car.
+3. Watch for this line in the serial output:
+
+   ```
+   Saved Wi-Fi found. Send 'r' within 3s to clear and force AP mode...
+   ```
+
+4. Send the character `r` within 3 seconds.
+5. The firmware responds:
+
+   ```
+   Credentials cleared. Starting in AP mode.
+   ```
+
+6. The car boots into AP mode. Join the `ELEGOO-...` SSID and use `192.168.4.1`.
+
+If no credentials are saved, the prompt does not appear and boot proceeds normally.
+
+Quick serial commands:
 
 ```bash
-ip neigh show | grep -i '30:ed:a0:1e:c4:38'
+# S3 (CDC serial)
+stty -F /dev/ttyACM0 115200 raw -echo && cat /dev/ttyACM0 &
+echo -n 'r' > /dev/ttyACM0
+
+# WROVER (USB-serial)
+stty -F /dev/ttyUSB0 115200 raw -echo && cat /dev/ttyUSB0 &
+echo -n 'r' > /dev/ttyUSB0
 ```
 
-If nothing appears, scan the current subnet first.
+Or use the Arduino IDE serial monitor / `screen` and type `r` when the prompt appears.
 
-Example for a `192.168.1.x` LAN:
+## Problem: Need To Find The ESP32 IP On The LAN
+
+**Prefer these methods first — they do not require subnet scanning:**
+
+1. **Serial boot log** — the IP is printed at boot if STA connect succeeds:
+   ```
+   STA connected with IP: 192.168.1.42
+   ```
+2. **mDNS** — if a hostname was configured during provisioning:
+   ```bash
+   ping hiro1.local
+   ```
+3. **Router DHCP table** — look for a device named `ELEGOO-...` or your configured hostname.
+4. **`/wifi/status` before leaving AP mode** — while still on the AP, open `http://192.168.4.1/wifi/status` to read the STA IP the device was assigned.
+
+**Last resort — subnet scan** (replace MAC and subnet for your car):
 
 ```bash
 nmap -sn 192.168.1.0/24 >/dev/null
-ip neigh show | grep -i '30:ed:a0:1e:c4:38'
+ip neigh show | grep -i '<your-car-mac>'
 ```
 
-Example for a `192.168.4.0/22` LAN:
+The MAC address is printed at every boot:
 
-```bash
-nmap -sn 192.168.4.0/22 >/dev/null
-ip neigh show | grep -i '30:ed:a0:1e:c4:38'
 ```
-
-If a line appears like:
-
-```text
-192.168.4.23 dev wlp0s20f3 lladdr 30:ed:a0:1e:c4:38 STALE
+STA MAC: 30:ed:a0:1e:c4:38
+AP MAC:  32:ed:a0:1e:c4:38
 ```
-
-then the car IP is `192.168.4.23`.
 
 ## Problem: ESP32 Fails To Join Wi-Fi And Falls Back To AP
 

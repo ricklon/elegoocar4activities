@@ -59,10 +59,14 @@ Steps:
    - the router DHCP/client list
    - the ESP32 serial boot log
    - `/wifi/status` before leaving AP mode
+   - or the saved mDNS hostname if one was configured during AP setup, for example `hiro1.local`
 4. Use these car endpoints:
    - camera stream: `http://<car-lan-ip>:81/stream`
    - car host: `<car-lan-ip>`
    - car TCP port: `100`
+
+During AP-mode provisioning at `/wifi`, you can optionally save a hostname such as `hiro1`.
+On networks with mDNS support, you can then use `hiro1.local` instead of the raw LAN IP.
 
 ## 2. Start Control Stack
 
@@ -137,3 +141,4 @@ Expected:
 - If the ESP32 is on your LAN: keep Bridge Host at `localhost:8787` only when the browser is on the same machine as the bridge. Otherwise use the bridge host machine's LAN IP.
 - If camera works but car does not move: verify ESP32<->UNO UART wiring.
 - If obstacle mode seems inactive: ensure the mode is ON and bridge build includes mode-aware polling.
+- **If the car has saved credentials for an unreachable network:** connect via USB, open serial monitor at 115200, reset the car, and send `r` within 3 seconds when prompted to clear credentials and force AP mode. See `docs/ESP32_S3_TROUBLESHOOTING.md` for the full recovery procedure.

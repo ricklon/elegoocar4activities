@@ -84,10 +84,17 @@ Provisioning flow:
 
 1. Fresh device boots into its own AP
 2. User connects to the AP and opens `/wifi`
-3. User saves local Wi-Fi credentials
+3. User saves local Wi-Fi credentials, and may optionally save a hostname such as `hiro1`
 4. Device reboots
 5. Device tries local Wi-Fi first
 6. If the join fails, it falls back to its own AP again
+
+Optional STA hostname behavior:
+
+- if a hostname is configured during AP provisioning
+- the ESP32 stores it with the Wi-Fi credentials
+- after successful STA join, it advertises `<hostname>.local` over mDNS
+- hostname uniqueness is expected to be coordinated by users or instructors
 
 Fallback AP operating details:
 
@@ -186,7 +193,7 @@ The camera web server also exposes local configuration endpoints:
 - `GET /wifi/status`
   - JSON network status
 - `POST /wifi/config`
-  - stores local Wi-Fi credentials in NVS and reboots
+  - stores local Wi-Fi credentials and optional hostname in NVS and reboots
 - `POST /wifi/forget`
   - clears stored local Wi-Fi credentials and reboots to AP mode
 
