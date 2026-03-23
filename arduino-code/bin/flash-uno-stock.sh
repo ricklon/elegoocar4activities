@@ -5,7 +5,26 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SKETCH_DIR="$ROOT_DIR/arduino-code/arduino-uno-stock/SmartRobotCarV4.0_V1_20230201"
 BUILD_DIR="${BUILD_DIR:-/tmp/arduino-build-uno-stock}"
 FQBN="arduino:avr:uno"
-PORT="${1:-/dev/ttyUSB0}"
+
+detect_port() {
+  local candidate
+  for candidate in /dev/ttyUSB0 /dev/ttyACM0; do
+    if [[ -e "$candidate" ]]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+if [[ $# -ge 1 ]]; then
+  PORT="$1"
+elif PORT="$(detect_port)"; then
+  :
+else
+  echo "No UNO serial port found. Pass one explicitly, e.g. $0 /dev/ttyUSB0" >&2
+  exit 1
+fi
 
 if [[ -x "$HOME/mymachine/bin/arduino-cli" ]]; then
   ARDUINO_CLI="$HOME/mymachine/bin/arduino-cli"
