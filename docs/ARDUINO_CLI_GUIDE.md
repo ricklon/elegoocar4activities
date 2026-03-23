@@ -62,14 +62,18 @@ arduino-cli lib install "Servo"
 This project is a standalone curated workspace. Use the firmware copies under `arduino-code/`:
 
 ```bash
-UNO_FIRMWARE_PATH="arduino-code/arduino-uno/SmartRobotCarV4.0_V1_20230201_TB6612_MPU6050"
-UNO_QMI_FIRMWARE_PATH="arduino-code/arduino-uno/SmartRobotCarV4.0_V2_20220322_TB6612_QMI8658C"
+# UNO — pick the path that matches your kit
+UNO_FIRMWARE_PATH="arduino-code/arduino-uno/SmartRobotCarV4.0_V1_20230201_TB6612_MPU6050"     # older MPU6050 kit
+UNO_QMI_FIRMWARE_PATH="arduino-code/arduino-uno/SmartRobotCarV4.0_V2_20220322_TB6612_QMI8658C" # newer QMI8658C kit
+
+# ESP32 — Tier 2 class firmware (stable)
 ESP32_FIRMWARE_PATH="arduino-code/esp32-camera/ESP32_CameraServer_AP_simple"
+
+# ESP32 — Tier 3 WS firmware (mDNS + car identity)
+ESP32_WS_FIRMWARE_PATH="arduino-code/esp32-camera/ESP32_CameraServer_WS"
 ```
 
-Use:
-- `UNO_FIRMWARE_PATH` for older `MPU6050` kits
-- `UNO_QMI_FIRMWARE_PATH` for newer `QMI8658C` kits
+See `docs/FLASH_MATRIX.md` for the full script-per-variant reference.
 
 ## Connect the Arduino
 
@@ -209,8 +213,9 @@ Check the chip markings on your camera module.
 
 | Firmware | ESP32-WROVER | ESP32-S3 | Notes |
 |----------|--------------|----------|-------|
-| `ESP32_CameraServer_AP_simple` | ✓ | ✓ | Project firmware now supports both targets with board-specific UART pins |
-| `ESP32_CameraServer_AP_20220120` | ✓ | ✗ | Face detection requires old API |
+| `ESP32_CameraServer_AP_simple` (Tier 2) | ✓ | ✓ | Stable class firmware. AP + LAN fallback. Both targets via `board_profile.h`. |
+| `ESP32_CameraServer_WS` (Tier 3) | ✓ | ✓ | mDNS hostname, car identity. Use `provision-car-*.sh` scripts. |
+| `ESP32_CameraServer_AP_20220120` (stock) | ✓ | ✗ | Face detection requires old API not available on S3. Reference only. |
 
 The original firmware uses `fd_forward.h` face detection API which is not available for ESP32-S3. ESP32-S3 uses a different face detection library (`esp-dl`) which requires significant code changes.
 

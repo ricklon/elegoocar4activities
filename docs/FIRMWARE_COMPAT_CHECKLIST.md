@@ -1,21 +1,30 @@
 # Firmware Compatibility Checklist (UNO + ESP32-S3 + Web UI)
 
-Last verified: 2026-03-02
+Last verified: 2026-03-22
 
 This checklist defines the firmware contract required for `wifi-control-ui` and records current compile/audit status.
 
 ## 1) Required Firmware Sources
 
-- UNO:
+### UNO (use the path that matches your kit)
+
+- V1 — older `MPU6050` kit:
   - `arduino-code/arduino-uno/SmartRobotCarV4.0_V1_20230201_TB6612_MPU6050`
-  - main sketch file: `SmartRobotCarV4.0_V1_20230201_TB6612_MPU6050.ino`
-  - older `MPU6050` kit path
-- UNO:
+- V2 — newer `QMI8658C` kit:
   - `arduino-code/arduino-uno/SmartRobotCarV4.0_V2_20220322_TB6612_QMI8658C`
-  - main sketch file: `SmartRobotCarV4.0_V2_20220322_TB6612_QMI8658C.ino`
-  - newer `QMI8658C` kit path
-- ESP32-S3 camera/socket:
+
+Both UNO variants implement the same command/telemetry protocol (`N=3`, `N=24`, `N=25`, etc.).
+
+### ESP32 camera/socket (choose tier)
+
+- Tier 2 — class firmware (stable):
   - `arduino-code/esp32-camera/ESP32_CameraServer_AP_simple`
+  - supports ESP32-S3 and ESP32-WROVER via `board_profile.h`
+- Tier 3 — WS firmware (mDNS, car identity):
+  - `arduino-code/esp32-camera/ESP32_CameraServer_WS`
+  - supports ESP32-S3 and ESP32-WROVER via `board_profile.h`
+
+See `docs/FLASH_MATRIX.md` for the full script-per-variant reference.
 
 ## 2) Command Contract (Must Stay Compatible)
 
@@ -46,10 +55,11 @@ Heartbeat contract required between bridge and ESP32:
 
 ## 4) Compile Targets
 
-- UNO FQBN:
-  - `arduino:avr:uno`
-- ESP32-S3 FQBN:
-  - `esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc`
+- UNO FQBN: `arduino:avr:uno`
+- ESP32-S3 FQBN: `esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,PSRAM=opi,CDCOnBoot=cdc`
+- ESP32-WROVER FQBN: `esp32:esp32:esp32:PartitionScheme=huge_app,PSRAM=enabled`
+
+Both ESP32 tiers (Tier 2 `ESP32_CameraServer_AP_simple`, Tier 3 `ESP32_CameraServer_WS`) use the same FQBNs.
 
 ## 5) Compile Audit Result
 

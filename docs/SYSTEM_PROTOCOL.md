@@ -530,7 +530,7 @@ Replies:
 
 Notes:
 
-- `AX..GZ` are raw sensor values from the MPU6050
+- `AX..GZ` are raw IMU sensor values (MPU6050 on older kits, QMI8658C on newer kits — same protocol labels)
 - `YW` is emitted in centi-degrees to keep the UNO reply lightweight on AVR
 - current bridge polling requests IMU telemetry only in manual mode
 
